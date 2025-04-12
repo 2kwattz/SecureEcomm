@@ -14,9 +14,16 @@ const NodeCache = require("node-cache");
 // Miscellaneous
 
 const path = require('path')
+const cookieParser = require('cookie-parser'); // The name says it all
 
 // Serve static files from the 'public' folder
 app.use(express.static(path.join(__dirname, '../public')));
+
+// Database
+
+const mongoose = require('mongoose');
+const mongodb_url = process.env.DEVELOPMENT_MONGODB_URL
+require('../db/conn')
 
 // Route Endpoints
 
@@ -114,9 +121,7 @@ app.post('/', sqlInjectionGuard,(req, res) => {
     res.send('Basic Express server running.');
   });
 
-
-
   app.listen(PORT, () => {
-    console.log(`NodeJs Server running on http://localhost:${PORT}`);
+    console.log(`[*] NodeJs Server running on http://localhost:${PORT}`);
   });
 
