@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordPress Login</title>
+    <link rel="stylesheet" href="./decoyPages/css/wp-login.css">
+</head>
+<body>
+    <div id="login">
+        <h1><a href="https://wordpress.org/" title="Powered by WordPress">WordPress</a></h1>
+
+        <form name="loginform" id="loginform" action="login.php" method="post">
+            <p>
+                <label for="user_login">Username or Email Address</label>
+                <input type="text" name="log" id="user_login" class="input" value="" size="20" placeholder="Username or Email Address" required>
+            </p>
+
+            <p>
+                <label for="user_pass">Password</label>
+                <input type="password" name="pwd" id="user_pass" class="input" value="" size="20" placeholder="Password" required>
+            </p>
+
+            <p class="forgetmenot">
+                <label for="rememberme">
+                    <input name="rememberme" type="checkbox" id="rememberme" value="forever"> Remember Me
+                </label>
+            </p>
+
+            <p class="submit">
+                <input type="submit" name="wp-submit" id="wp-submit" class="button button-primary button-large" value="Log In">
+            </p>
+
+            <p id="nav">
+                <a href="https://wordpress.org/support/lost-password/" title="Lost your password?">Lost your password?</a>
+            </p>
+
+            <input type="hidden" name="redirect_to" value="https://your-site.com/dashboard">
+            <input type="hidden" name="testcookie" value="1">
+        </form>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

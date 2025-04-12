@@ -2,6 +2,11 @@
 
 const express = require('express');
 const router = express.Router();
+const path = require('path'); 
+const app = express()
+
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 // Fake route: Simulate WordPress admin dashboard
 router.get('/wp-admin', (req, res) => {
@@ -33,20 +38,26 @@ router.get('/api/v1/secret-key', (req, res) => {
 });
 
 // Fake WordPress login page
+// router.get('/wp-login.php', (req, res) => {
+//     res.send(`
+//     <html>
+//       <head><title>Log In ‹ My WordPress Site — WordPress</title></head>
+//       <body>
+//         <h1>WordPress Login</h1>
+//         <form>
+//           Username: <input/><br>
+//           Password: <input type="password"/><br>
+//           <button>Login</button>
+//         </form>
+//       </body>
+//     </html>
+//   `);
+// });
+
 router.get('/wp-login.php', (req, res) => {
-    res.send(`
-    <html>
-      <head><title>Log In ‹ My WordPress Site — WordPress</title></head>
-      <body>
-        <h1>WordPress Login</h1>
-        <form>
-          Username: <input/><br>
-          Password: <input type="password"/><br>
-          <button>Login</button>
-        </form>
-      </body>
-    </html>
-  `);
+
+   const wpLoginPagePath = path.join(__dirname, '../public/DecoyPages', 'wp-login.html');
+   res.sendFile(wpLoginPagePath)
 });
 
 // Fake WordPress JSON API endpoint

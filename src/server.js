@@ -4,6 +4,17 @@ const express = require('express');
 const app = express()
 require("dotenv").config() // Dotenv enviornment for variables
 
+// Optimization & Compression
+
+const compression = require('compression');
+
+// Miscellaneous
+
+const path = require('path')
+
+// Serve static files from the 'public' folder
+app.use(express.static(path.join(__dirname, '../public')));
+
 // Route Endpoints
 
 const decoyRoutes = require("../routes/decoyRoutes") // Decoy routes for confusing network sniffers & bots
@@ -36,6 +47,7 @@ const PORT = process.env.PORT || 3000
 
 app.use(express.json()); // JSON Parser
 app.set('trust proxy', true); // Allows Express to look at X-Forwarded-For header to get Client's IP Address
+app.use(compression()) // GZip Compression for faster loading time
 
 // Patch: redefine req.query to be mutable
 app.use((req, res, next) => {
@@ -68,6 +80,11 @@ if (process.env.NODE_ENV === 'production') {
 else{
   console.log("\n[*] Node is in Development Enviornment. HTTPS Redirection not implemented.\n")
 }
+
+// Optimization
+
+
+
 // Routes 
 
 app.get('/', sqlInjectionGuard,(req, res) => {
