@@ -4,6 +4,10 @@ const express = require('express');
 const app = express()
 require("dotenv").configure() // Dotenv enviornment for variables
 
+// Route Endpoints
+
+const decoyRoutes = require("../routes/decoyRoutes") // Decoy routes for confusing network sniffers & bots
+
 // Security
 
 const helmet = require('helmet'); // Helmet Middleware
@@ -14,9 +18,11 @@ const spoofedHeaders = require('../middlewares/spoofedHeaders')
 const IpBlocklist = require("../middlewares/IpBlocklist")
 const { loginLimiter, forgotPasswordLimiter, securityQuestionAnswerLimiter} = require('../middlewares/rateLimiter');
 
+// Disable Express's default X-Powered-By header
+app.disable('x-powered-by');
+
 const cors = require('cors');
   
-
 // PORT
 
 const PORT = process.env.PORT || 3000   
