@@ -7,6 +7,9 @@ require("dotenv").config() // Dotenv enviornment for variables
 // Optimization & Compression
 
 const compression = require('compression');
+const NodeCache = require("node-cache");
+// const cache = new NodeCache();
+
 
 // Miscellaneous
 
@@ -23,12 +26,11 @@ const decoyRoutes = require("../routes/decoyRoutes") // Decoy routes for confusi
 // Security
 
 const helmet = require('helmet'); // Helmet Middleware
-const rateLimit = require('express-rate-limit'); // Express Rate Limiter
-const mongoSanitize = require('express-mongo-sanitize');
-const sqlInjectionGuard = require('../middlewares/sqlInjectionGuard')
-const spoofedHeaders = require('../middlewares/spoofedHeaders')
-const IpBlocklist = require("../middlewares/IpBlocklist")
-const { loginLimiter, forgotPasswordLimiter, securityQuestionAnswerLimiter} = require('../middlewares/rateLimiter');
+const mongoSanitize = require('express-mongo-sanitize'); // Prevents NoSQL Attacks
+const sqlInjectionGuard = require('../middlewares/sqlInjectionGuard') // Prevents SQL Attacks
+const spoofedHeaders = require('../middlewares/spoofedHeaders') // Honeypot baiter
+const IpBlocklist = require("../middlewares/IpBlocklist") // Blocked IP Addresses
+const { loginLimiter, forgotPasswordLimiter, securityQuestionAnswerLimiter} = require('../middlewares/rateLimiter'); // Express Rate limiter
 
 // Disable Express's default X-Powered-By header
 app.disable('x-powered-by');
@@ -72,14 +74,31 @@ app.use('/', decoyRoutes); // Setting decoy routes for honeypot bait
 
 if (process.env.NODE_ENV === 'production') {
   app.use((req, res, next) => {
-    if (!req.secure) return res.redirect('https://' + req.headers.host + req.url);
-    next();
+    try {
+
+      if (!req.secure) {
+        const host = req.headers.host;
+        const url = req.url;
+
+        if (!host || !url) {
+          console.warn("[!] Missing headers in request, skipping redirect.");
+          return next(); // Graceful degradation
+        }
+
+        const redirectUrl = `https://${host}${url}`;
+        console.log(`[→] Redirecting insecure request to: ${redirectUrl}`);
+        return res.redirect(301, redirectUrl); // 🔁 Permanent Redirect
+      }
+      next();
+    } catch (error) {
+      console.error("[*] HTTPS Middleware Redirect Error:", error.message);
+      return next(); // Always call next() in error case
+    }
   });
+} else {
+  console.log("\n[*] Node is in Development Environment. HTTPS Redirection not implemented.\n");
 }
 
-else{
-  console.log("\n[*] Node is in Development Enviornment. HTTPS Redirection not implemented.\n")
-}
 
 // Optimization
 
