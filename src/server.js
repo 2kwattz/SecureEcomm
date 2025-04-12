@@ -2,11 +2,12 @@
 
 const express = require('express');
 const app = express()
-require("dotenv").configure() // Dotenv enviornment for variables
+require("dotenv").config() // Dotenv enviornment for variables
 
 // Route Endpoints
 
 const decoyRoutes = require("../routes/decoyRoutes") // Decoy routes for confusing network sniffers & bots
+
 
 // Security
 
@@ -53,6 +54,7 @@ app.use(helmet()); // Helmet's common web vulnerbility security
 app.use(sqlInjectionGuard); // Protection against SQL Injection Attacks
 app.use(spoofedHeaders) /// Express Header Mask
 app.use(IpBlocklist) // Prevents Blocked IP Addresses to access the web application
+app.use('/', decoyRoutes); // Setting decoy routes for honeypot bait
 
 // Redirect all Http traffic to Https in Production enviornment
 
@@ -64,7 +66,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 else{
-  console.log("[*] Node is in Development Enviornment. HTTPS Redirection not implemented.\n")
+  console.log("\n[*] Node is in Development Enviornment. HTTPS Redirection not implemented.\n")
 }
 // Routes 
 
