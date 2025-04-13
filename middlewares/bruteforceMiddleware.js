@@ -17,7 +17,7 @@ const generateServersideFingerprint = (req) => {
     const agent = useragent.parse(userAgent)
 
     const fingerprint = `${ip} | ${agent.family} | ${agent.os} | ${language}`
-    console.log("User Fingerprint", fingerprint)
+    console.log("[*] User Fingerprint captured ", fingerprint)
 
     return fingerprint;
 }
@@ -27,7 +27,6 @@ const bruteforceMiddleware = async(req,res,next) => {
     // Fetching IP Addresses of the suspicious user
     const ip = req.ip || req.connection.remoteAddress;
     const deviceFingerprint = generateServersideFingerprint(req);
-    console.log(deviceFingerprint)
     next()
 
 }
