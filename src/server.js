@@ -52,7 +52,7 @@ const sqlInjectionGuard = require('../middlewares/sqlInjectionGuard') // Prevent
 const spoofedHeaders = require('../middlewares/spoofedHeaders') // Honeypot baiter
 const IpBlocklist = require("../middlewares/IpBlocklist") // Blocked IP Addresses
 const { loginLimiter, forgotPasswordLimiter, securityQuestionAnswerLimiter} = require('../middlewares/rateLimiter'); // Express Rate limiter
-
+const bruteforceMiddleware = require('../middlewares/bruteforceMiddleware')
 // Disable Express's default X-Powered-By header
 app.disable('x-powered-by');
 
@@ -127,7 +127,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // Routes 
 
-app.get('/', sqlInjectionGuard,(req, res) => {
+app.get('/', sqlInjectionGuard,bruteforceMiddleware,(req, res) => {
     res.send('Basic Express server running.');
   });
 
