@@ -91,9 +91,12 @@ app.use(spoofedHeaders) /// Express Header Mask
 app.use(IpBlocklist) // Prevents Blocked IP Addresses to access the web application
 app.use('/', decoyRoutes); // Setting decoy routes for honeypot bait
 
+app.use(express.urlencoded({ extended: true })); // For parsing body data
+
 // Redirect all Http traffic to Https in Production enviornment
 
 if (process.env.NODE_ENV === 'production') {
+  
   app.use((req, res, next) => {
     try {
 
@@ -131,6 +134,47 @@ app.get('/', sqlInjectionGuard,bruteforceMiddleware,(req, res) => {
     res.send('Basic Express server running.');
   });
 
+  app.get('/login', (req,res) => {
+res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login Form</title>
+</head>
+<body>
+
+    <h2>Login</h2>
+    <form action="/login" method="POST">
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required><br><br>
+
+        <button type="submit">Login</button>
+    </form>
+
+</body>
+</html>
+`)
+  })
+
+  app.post('/login', bruteforceMiddleware, async (req,res)=>{
+    const password = req.body.password;
+    const email = req.body.email;
+
+    const realPassword = "12345678"
+
+    if(password !== realPassword){
+      await req.bruteforce.fail()
+      console.log(`[*] Login Failed `)
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+    else{
+      await req.bruteforce.success();
+      res.status(200).json({ message: "Logged in successfully" });
+    }
+  })
 app.post('/', sqlInjectionGuard,(req, res) => {
     res.send('Basic Express server running.');
   });
