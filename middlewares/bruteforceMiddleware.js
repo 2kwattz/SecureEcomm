@@ -2,6 +2,11 @@ const redis = require('redis');
 const client = redis.createClient(); // Connecting to Redis
 const useragent = require('useragent');
 
+//  Connecting to the Redis Client
+client.connect().catch((err) => {
+    console.log("[*] Error In Connecting To The Redis Client:", err);
+});
+
 // Login Bruteforce Prevention
 
 const MAX_LOGIN_ATTEMPTS = 10; // Max failed login attempts
