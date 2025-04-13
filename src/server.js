@@ -15,6 +15,17 @@ const NodeCache = require("node-cache");
 
 const path = require('path')
 const cookieParser = require('cookie-parser'); // The name says it all
+const {sendEmail} = require('../services/sendEmail')
+
+// Test Email
+
+sendEmail({
+  to: "prakashbhatia1970@gmail.com",
+  subject: "test",
+  text: "test",
+  html: "<b>Test</b>"
+});
+
 
 // Serve static files from the 'public' folder
 app.use(express.static(path.join(__dirname, '../public')));
