@@ -15,17 +15,20 @@ const NodeCache = require("node-cache");
 
 const path = require('path')
 const cookieParser = require('cookie-parser'); // The name says it all
-const {sendEmail} = require('../services/sendEmail')
+const {dispatchEmail} = require('../services/sendEmail')
 
 // Test Email
 
-sendEmail({
-  to: "prakashbhatia1970@gmail.com",
-  subject: "test",
-  text: "test",
-  html: "<b>Test</b>"
-});
+// dispatchEmail('forgotPassword','prakashbhatia1970@gmail.com',{
+//   type: 'forgotPassword',
+//   to: 'prakashbhatia1970@gmail.com',
+//   data: {
+//     username: "Bunty",
+//     resetLink: 'https:localhost:3000/resetPassword',
+//     expiryTime: 10
+//   }
 
+// })
 
 // Serve static files from the 'public' folder
 app.use(express.static(path.join(__dirname, '../public')));
