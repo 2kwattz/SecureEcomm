@@ -39,6 +39,8 @@ const dispatchEmail = async (type, to, data) => {
     console.log("Type in dispatch email function", type)
 
     switch (type) {
+
+        // Account Email Configurations
         
         // Password Reset Email Configuration
 
@@ -60,9 +62,33 @@ const dispatchEmail = async (type, to, data) => {
 
             break;
 
+        // Account Creation Email Configuration
+
+        case 'accountCreated':
+            console.log("[*] Account Created Email Type used");
+
+         // Account Locked Email Configuration
+        
+        case 'accountLocked':
+            console.log("[*] Account Locked Email Type used ")
+
+
+        // Email Testing Configuration
+
+        case 'testEmail':
+            console.log("[*] Test Email Type used ")
+
+        // Account Disabled Email Configuration
+
+        case 'accountDisabled':
+            console.log("[*] Account Disabled Email Type used ")
+
 
         default:
-            console.log(`[*] Unknown email type: ${type}`);
+
+        // Default Switch Case (No condition matched)
+
+        console.log(`[*] Unknown email type: ${type}`);
     }
 
 
