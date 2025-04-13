@@ -42,11 +42,12 @@ const bruteforceMiddleware = async(req,res,next) => {
     // Fetching IP Addresses of the suspicious user
     const ip = req.ip || req.connection.remoteAddress;
     // const deviceFingerprint = generateServersideFingerprint(req);
-    const userAgent = req.headers['user-agent'] || "unknown"
+    const userAgent = req?.headers['user-agent'] || "unknown"
     const fingerprint = userAgent.replace(/\s/g,"_");
+    const emailAddress = req?.body?.email.trim().toLowerCase();
 
     // Unique key for this combo
-    const key = `bf:${ip}:${fingerprint}`;
+    const key = `bf:${ip}:${fingerprint}:${emailAddress}`;
 
     // Check for failed attempts
     const attempts = await getAsync(key)
