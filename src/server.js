@@ -45,7 +45,7 @@ const decoyRoutes = require("../routes/decoyRoutes") // Decoy routes for confusi
 
 
 // Security
-
+const csrf = require('csurf');
 const helmet = require('helmet'); // Helmet Middleware
 const mongoSanitize = require('express-mongo-sanitize'); // Prevents NoSQL Attacks
 const sqlInjectionGuard = require('../middlewares/sqlInjectionGuard') // Prevents SQL Attacks
@@ -57,7 +57,7 @@ const bruteforceMiddleware = require('../middlewares/bruteforceMiddleware')
 app.disable('x-powered-by');
 
 const cors = require('cors');
-  
+
 // PORT
 
 const PORT = process.env.PORT || 3000   
@@ -72,6 +72,7 @@ app.use(express.json()); // JSON Parser
 app.use(express.urlencoded({ extended: true })); // Body Parser
 app.set('trust proxy', true); // Allows Express to look at X-Forwarded-For header to get Client's IP Address
 app.use(compression()) // GZip Compression for faster loading time
+// app.use(csrf({ cookie: true }));
 
 // Patch: redefine req.query to be mutable
 app.use((req, res, next) => {
