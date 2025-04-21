@@ -49,32 +49,38 @@ const bruteforceMiddleware = async(req,res,next) => {
     // Unique key for this combo
     const key = `bf:${ip}:${fingerprint}:${emailAddress}`;
 
-    // Check for failed attempts
-    const attempts = await getAsync(key)
+    try{
+ // Check for failed attempts
+ const attempts = await getAsync(key)
 
-    if(attempts && parseInt(attempts) >= MAX_LOGIN_ATTEMPTS){
-        return res.status(429).json({
-            message: "Too many login attempts. Please try again after 15 minutes"
-        })
+ if(attempts && parseInt(attempts) >= MAX_LOGIN_ATTEMPTS){
+     return res.status(429).json({
+         message: "Too many login attempts. Please try again after 15 minutes"
+     })
+ }
+ req.bruteforce = {
+     fail: async() =>{
+         if(!attempts){
+             await setAsync(key, 1);
+             await expireAsync(key, BLOCKED_TIME);
+             console.log("[*] Current Value and attempts ", key, attempts)
+         }
+         else{
+             await incrAsync(key)
+             console.log("[*] Current Value and attempts ", key, attempts)
+         }
+     },
+     success: async () =>{
+         delAsync(key)
+     }
+ };
+
+ next();
     }
-    req.bruteforce = {
-        fail: async() =>{
-            if(!attempts){
-                await setAsync(key, 1);
-                await expireAsync(key, BLOCKED_TIME);
-                console.log("[*] Current Value and attempts ", key, attempts)
-            }
-            else{
-                await incrAsync(key)
-                console.log("[*] Current Value and attempts ", key, attempts)
-            }
-        },
-        success: async () =>{
-            delAsync(key)
-        }
-    };
-
-    next();
+    catch(error){
+        console.log("[*] Error in Bruteforce Prevention Middleware ", error)
+    }
+   
 
 }
 
