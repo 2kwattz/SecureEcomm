@@ -187,6 +187,8 @@ app.post('/', sqlInjectionGuard,(req, res) => {
     res.send('Basic Express server running.');
   });
 
+  // Server Listening
+
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`[*] NodeJs Server running on ${PORT} `);
   });
