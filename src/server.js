@@ -128,8 +128,6 @@ if (process.env.NODE_ENV === 'production') {
 
 // Optimization
 
-
-
 // Routes 
 
 app.get('/', sqlInjectionGuard,bruteforceMiddleware,(req, res) => {
@@ -162,26 +160,34 @@ res.send(`<!DOCTYPE html>
   })
 
   app.post('/login', bruteforceMiddleware, async (req,res)=>{
-    const password = req.body.password;
-    const email = req.body.email;
 
-    const realPassword = "12345678"
+    try{
 
-    if(password !== realPassword){
-      await req.bruteforce.fail()
-      console.log(`[*] Login Failed `)
-      return res.status(401).json({ message: "Invalid credentials" });
+      const password = req.body.password;
+      const email = req.body.email;
+  
+      const realPassword = "12345678"
+  
+      if(password !== realPassword){
+        await req.bruteforce.fail()
+        console.log(`[*] Login Failed `)
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+      else{
+        await req.bruteforce.success();
+        res.status(200).json({ message: "Logged in successfully" });
+      }
     }
-    else{
-      await req.bruteforce.success();
-      res.status(200).json({ message: "Logged in successfully" });
+
+    catch(error){
+      console.log("[*] Error in Login POST Route ",error)
     }
   })
 app.post('/', sqlInjectionGuard,(req, res) => {
     res.send('Basic Express server running.');
   });
 
-  app.listen(PORT, () => {
-    console.log(`[*] NodeJs Server running on http://localhost:${PORT}`);
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`[*] NodeJs Server running on ${PORT} `);
   });
 

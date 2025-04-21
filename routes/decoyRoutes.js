@@ -56,6 +56,8 @@ router.get('/api/v1/secret-key', (req, res) => {
 
 router.get('/wp-login.php', (req, res) => {
 
+    console.log("GET Req sent to WP Login from ",req.ip)
+
    const wpLoginPagePath = path.join(__dirname, '../public/DecoyPages', 'wp-login.html');
    res.sendFile(wpLoginPagePath)
 });
