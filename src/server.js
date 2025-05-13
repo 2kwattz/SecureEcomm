@@ -30,8 +30,7 @@ const {dispatchEmail} = require('../services/sendEmail')
 
 // })
 
-// Serve static files from the 'public' folder
-app.use(express.static(path.join(__dirname, '../public')));
+
 
 // Database
 
@@ -68,11 +67,14 @@ const PORT = process.env.PORT || 3000
 // to secure your app from common web vulnerabilities such as: Cross-Site Scripting (XSS), Clickjacking
 // MIME sniffing, Protocol downgrade attacks, Cross-Origin data leaks
 
+
 app.use(express.json()); // JSON Parser
 app.use(express.urlencoded({ extended: true })); // Body Parser
 app.set('trust proxy', true); // Allows Express to look at X-Forwarded-For header to get Client's IP Address
 app.use(compression()) // GZip Compression for faster loading time
 // app.use(csrf({ cookie: true }));
+// Serve static files from the 'public' folder
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Patch: redefine req.query to be mutable
 app.use((req, res, next) => {
@@ -93,7 +95,13 @@ app.use(spoofedHeaders) /// Express Header Mask
 app.use(IpBlocklist) // Prevents Blocked IP Addresses to access the web application
 app.use('/', decoyRoutes); // Setting decoy routes for honeypot bait
 
-app.use(express.urlencoded({ extended: true })); // For parsing body data
+
+// catch-all 404 (must come last)
+app.use((req, res) => {
+  res.status(404).send('404 - Not Found');
+});
+
+
 
 // Redirect all Http traffic to Https in Production enviornment
 
@@ -113,7 +121,7 @@ if (process.env.NODE_ENV === 'production') {
 
         const redirectUrl = `https://${host}${url}`;
         console.log(`[→] Redirecting insecure request to: ${redirectUrl}`);
-        return res.redirect(301, redirectUrl); // 🔁 Permanent Redirect
+        return res.redirect(301, redirectUrl); // Permanent Redirect
       }
       next();
     } catch (error) {
@@ -129,6 +137,8 @@ if (process.env.NODE_ENV === 'production') {
 // Optimization
 
 // Routes 
+
+
 
 app.get('/', sqlInjectionGuard,bruteforceMiddleware,(req, res) => {
     res.send('Basic Express server running.');
@@ -186,6 +196,11 @@ res.send(`<!DOCTYPE html>
 app.post('/', sqlInjectionGuard,(req, res) => {
     res.send('Basic Express server running.');
   });
+
+
+
+
+
 
   // Server Listening
 

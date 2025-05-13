@@ -8,6 +8,7 @@ const app = express()
 app.use(express.static(path.join(__dirname, 'public')));
 
 
+
 // Fake route: Simulate WordPress admin dashboard
 router.get('/wp-admin', (req, res) => {
     res.status(403).send('Access Denied');
