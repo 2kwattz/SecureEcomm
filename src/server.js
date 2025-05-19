@@ -96,11 +96,6 @@ app.use(IpBlocklist) // Prevents Blocked IP Addresses to access the web applicat
 app.use('/', decoyRoutes); // Setting decoy routes for honeypot bait
 
 
-// catch-all 404 (must come last)
-app.use((req, res) => {
-  res.status(404).send('404 - Not Found');
-});
-
 
 
 // Redirect all Http traffic to Https in Production enviornment
@@ -138,6 +133,10 @@ if (process.env.NODE_ENV === 'production') {
 
 // Routes 
 
+app.get('/error500', (req, res, next) => {
+  // Simulate a server crash
+  next(new Error('Internal Server Error'));
+});
 
 
 app.get('/', sqlInjectionGuard,bruteforceMiddleware,(req, res) => {
@@ -198,7 +197,36 @@ app.post('/', sqlInjectionGuard,(req, res) => {
   });
 
 
-
+  app.use((err, req, res, next) => {
+    console.error(err.stack);
+  
+    const status = err.status || 500;
+  
+    switch (status) {
+      case 400:
+        res.status(400).send('400 - Bad Request');
+        break;
+      case 401:
+        res.status(401).send('401 - Unauthorized');
+        break;
+      case 403:
+        res.status(403).send('403 - Forbidden');
+        break;
+      case 404:
+        res.status(404).send('404 - Not Found');
+        break;
+      case 500:
+      default:
+        res.status(500).send('500 - Internal Server Error');
+        break;
+    }
+  });
+  
+    // catch-all 404 (must come last)
+    app.use((req, res) => {
+      res.status(404).send('404 - Not Found');
+    });
+  
 
 
 
