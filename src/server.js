@@ -15,7 +15,7 @@ const NodeCache = require("node-cache");
 
 const path = require('path')
 const cookieParser = require('cookie-parser'); // The name says it all
-const {dispatchEmail} = require('../services/sendEmail')
+const { dispatchEmail } = require('../services/sendEmail')
 
 // Test Email
 
@@ -50,7 +50,7 @@ const mongoSanitize = require('express-mongo-sanitize'); // Prevents NoSQL Attac
 const sqlInjectionGuard = require('../middlewares/sqlInjectionGuard') // Prevents SQL Attacks
 const spoofedHeaders = require('../middlewares/spoofedHeaders') // Honeypot baiter
 const IpBlocklist = require("../middlewares/IpBlocklist") // Blocked IP Addresses
-const { loginLimiter, forgotPasswordLimiter, securityQuestionAnswerLimiter} = require('../middlewares/rateLimiter'); // Express Rate limiter
+const { loginLimiter, forgotPasswordLimiter, securityQuestionAnswerLimiter } = require('../middlewares/rateLimiter'); // Express Rate limiter
 const bruteforceMiddleware = require('../middlewares/bruteforceMiddleware')
 // const authRoutes = require('../controller/auth.controller')
 // Disable Express's default X-Powered-By header
@@ -60,7 +60,7 @@ const cors = require('cors');
 
 // PORT
 
-const PORT = process.env.PORT || 3000   
+const PORT = process.env.PORT || 3000
 
 // Middlewares
 
@@ -80,15 +80,15 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // Patch: redefine req.query to be mutable
 app.use((req, res, next) => {
-    const queryClone = Object.assign({}, req.query);
-    Object.defineProperty(req, 'query', {
-      value: queryClone,
-      writable: true,
-      enumerable: true,
-      configurable: true,
-    });
-    next();
+  const queryClone = Object.assign({}, req.query);
+  Object.defineProperty(req, 'query', {
+    value: queryClone,
+    writable: true,
+    enumerable: true,
+    configurable: true,
   });
+  next();
+});
 
 app.use(mongoSanitize()); // Protection against NoSQL Injection Attacks
 app.use(helmet()); // Helmet's common web vulnerbility security
@@ -101,7 +101,7 @@ app.use('/', decoyRoutes); // Setting decoy routes for honeypot bait
 // Redirect all Http traffic to Https in Production enviornment
 
 if (process.env.NODE_ENV === 'production') {
-  
+
   app.use((req, res, next) => {
     try {
 
@@ -177,9 +177,9 @@ app.use('/', routes);
 
 //       const password = req.body.password;
 //       const email = req.body.email;
-  
+
 //       const realPassword = "12345678"
-  
+
 //       if(password !== realPassword){
 //         await req.bruteforce.fail()
 //         console.log(`[*] Login Failed `)
@@ -200,42 +200,44 @@ app.use('/', routes);
 //   });
 
 
-  app.use((err, req, res, next) => {
-    console.error(err.stack);
-  
-    const status = err.status || 500;
-  
-    switch (status) {
-      case 400:
-        res.status(400).send('400 - Bad Request');
-        break;
-      case 401:
-        res.status(401).send('401 - Unauthorized');
-        break;
-      case 403:
-        res.status(403).send('403 - Forbidden');
-        break;
-      case 404:
-        res.status(404).send('404 - Not Found');
-        break;
-      case 500:
-      default:
-        res.status(500).send('500 - Internal Server Error');
-        break;
-    }
-  });
-  
-    // catch-all 404 (must come last)
-    app.use((req, res) => {
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+
+  const status = err.status || 500;
+
+  switch (status) {
+    case 400:
+      res.status(400).send('400 - Bad Request');
+      break;
+    case 401:
+      res.status(401).send('401 - Unauthorized');
+      break;
+
+    case 402:
+      res.status(402).send('402 - Payment Required'); // Rarely used, but hey
+      break;
+    case 403:
+      res.status(403).send('403 - Forbidden');
+      break;
+    case 404:
       res.status(404).send('404 - Not Found');
-    });
-  
+      break;
+    case 500:
+    default:
+      res.status(500).send('500 - Internal Server Error');
+      break;
+  }
+});
+
+// catch-all 404 (must come last)
+app.use((req, res) => {
+  res.status(404).send('404 - Not Found');
+});
 
 
+// Server Listening
 
-  // Server Listening
-
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[*] NodeJs Server running on ${PORT} `);
-  });
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`[*] NodeJs Server running on ${PORT} `);
+});
 
