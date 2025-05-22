@@ -133,68 +133,71 @@ if (process.env.NODE_ENV === 'production') {
 
 // Routes 
 
-app.get('/error500', (req, res, next) => {
-  // Simulate a server crash
-  next(new Error('Internal Server Error'));
-});
+const routes = require('../routes/routes')
+app.use('/', routes);
+
+// app.get('/error500', (req, res, next) => {
+//   // Simulate a server crash
+//   next(new Error('Internal Server Error'));
+// });
 
 
-app.get('/', sqlInjectionGuard,bruteforceMiddleware,(req, res) => {
-    res.send('Basic Express server running.');
-  });
+// app.get('/', sqlInjectionGuard,bruteforceMiddleware,(req, res) => {
+//     res.send('Basic Express server running.');
+//   });
 
-  app.get('/login', (req,res) => {
-res.send(`<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login Form</title>
-</head>
-<body>
+//   app.get('/login', (req,res) => {
+// res.send(`<!DOCTYPE html>
+// <html lang="en">
+// <head>
+//     <meta charset="UTF-8">
+//     <title>Login Form</title>
+// </head>
+// <body>
 
-    <h2>Login</h2>
-    <form action="/login" method="POST">
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email" required><br><br>
+//     <h2>Login</h2>
+//     <form action="/login" method="POST">
+//         <label for="email">Email:</label><br>
+//         <input type="email" id="email" name="email" required><br><br>
 
-        <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password" required><br><br>
+//         <label for="password">Password:</label><br>
+//         <input type="password" id="password" name="password" required><br><br>
 
-        <button type="submit">Login</button>
-    </form>
+//         <button type="submit">Login</button>
+//     </form>
 
-</body>
-</html>
-`)
-  })
+// </body>
+// </html>
+// `)
+//   })
 
-  app.post('/login', bruteforceMiddleware, async (req,res)=>{
+//   app.post('/login', bruteforceMiddleware, async (req,res)=>{
 
-    try{
+//     try{
 
-      const password = req.body.password;
-      const email = req.body.email;
+//       const password = req.body.password;
+//       const email = req.body.email;
   
-      const realPassword = "12345678"
+//       const realPassword = "12345678"
   
-      if(password !== realPassword){
-        await req.bruteforce.fail()
-        console.log(`[*] Login Failed `)
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-      else{
-        await req.bruteforce.success();
-        res.status(200).json({ message: "Logged in successfully" });
-      }
-    }
+//       if(password !== realPassword){
+//         await req.bruteforce.fail()
+//         console.log(`[*] Login Failed `)
+//         return res.status(401).json({ message: "Invalid credentials" });
+//       }
+//       else{
+//         await req.bruteforce.success();
+//         res.status(200).json({ message: "Logged in successfully" });
+//       }
+//     }
 
-    catch(error){
-      console.log("[*] Error in Login POST Route ",error)
-    }
-  })
-app.post('/', sqlInjectionGuard,(req, res) => {
-    res.send('Basic Express server running.');
-  });
+//     catch(error){
+//       console.log("[*] Error in Login POST Route ",error)
+//     }
+//   })
+// app.post('/', sqlInjectionGuard,(req, res) => {
+//     res.send('Basic Express server running.');
+//   });
 
 
   app.use((err, req, res, next) => {
