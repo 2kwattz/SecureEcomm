@@ -1,12 +1,23 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose'); // Mongoose
+const bcrypt = require('bcryptjs'); // Bcrypt Encryption
 
-// models/User.js
+// Schema definitions
 
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 
-// Schema definition
+// Address Schema
+
+const addressSchema = {
+    addressLine1: { type: String, required: true, maxlength: 100 },
+    addressLine2: { type: String, required: false, maxlength: 100 },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
+    country: { type: String, required: true },
+    zipCode: { type: String, required: true }
+  };
+
+
+
+//  User Schema 
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -41,11 +52,22 @@ const userSchema = new mongoose.Schema({
     minlength: 6,
     // select: false 
   },
+
+  phone:{
+    type: String,
+    required: [true, 'Phone Number is required'],
+    match: [/^\+?[1-9]\d{1,14}$/, 'Invalid phone number']
+  },
   role: {
     type: String,
     enum: ['user', 'admin'],
     default: 'user'
   },
+  shippingAddress:
+   { type: addressSchema, required: true },
+  billingAddress:
+   { type: addressSchema, required: true },
+  
   createdAt: {
     type: Date,
     default: Date.now
