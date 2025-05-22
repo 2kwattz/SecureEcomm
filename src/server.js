@@ -52,6 +52,7 @@ const spoofedHeaders = require('../middlewares/spoofedHeaders') // Honeypot bait
 const IpBlocklist = require("../middlewares/IpBlocklist") // Blocked IP Addresses
 const { loginLimiter, forgotPasswordLimiter, securityQuestionAnswerLimiter} = require('../middlewares/rateLimiter'); // Express Rate limiter
 const bruteforceMiddleware = require('../middlewares/bruteforceMiddleware')
+// const authRoutes = require('../controller/auth.controller')
 // Disable Express's default X-Powered-By header
 app.disable('x-powered-by');
 
@@ -73,6 +74,7 @@ app.use(express.urlencoded({ extended: true })); // Body Parser
 app.set('trust proxy', true); // Allows Express to look at X-Forwarded-For header to get Client's IP Address
 app.use(compression()) // GZip Compression for faster loading time
 // app.use(csrf({ cookie: true }));
+
 // Serve static files from the 'public' folder
 app.use(express.static(path.join(__dirname, '../public')));
 
@@ -94,9 +96,7 @@ app.use(sqlInjectionGuard); // Protection against SQL Injection Attacks
 app.use(spoofedHeaders) /// Express Header Mask
 app.use(IpBlocklist) // Prevents Blocked IP Addresses to access the web application
 app.use('/', decoyRoutes); // Setting decoy routes for honeypot bait
-
-
-
+// app.use(authRoutes)
 
 // Redirect all Http traffic to Https in Production enviornment
 

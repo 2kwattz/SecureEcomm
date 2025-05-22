@@ -1,9 +1,14 @@
+const authController = require('../controller/auth.controller.js');
+
 const express = require('express');
 const router = express.Router();
 
+//  Auth Controller 
+
+
 // Middleware imports
-const sqlInjectionGuard = require('../middlewares/sqlInjectionGuard'); // adjust the path
-const bruteforceMiddleware = require('../middlewares/bruteforceMiddleware'); // adjust the path
+const sqlInjectionGuard = require('../middlewares/sqlInjectionGuard'); 
+const bruteforceMiddleware = require('../middlewares/bruteforceMiddleware'); 
 
 // GET: Simulate server crash
 router.get('/error500', (req, res, next) => {
@@ -21,7 +26,7 @@ router.post('/', sqlInjectionGuard, (req, res) => {
 });
 
 // GET: Login Form
-router.get('/login', (req, res) => {
+router.get('/login-page', (req, res) => {
   res.send(`<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,7 +35,7 @@ router.get('/login', (req, res) => {
 </head>
 <body>
     <h2>Login</h2>
-    <form action="/login" method="POST">
+    <form action="/login-page" method="POST">
         <label for="email">Email:</label><br>
         <input type="email" id="email" name="email" required><br><br>
         <label for="password">Password:</label><br>
@@ -42,7 +47,7 @@ router.get('/login', (req, res) => {
 });
 
 // POST: Login handler
-router.post('/login', bruteforceMiddleware, async (req, res) => {
+router.post('/login-page', bruteforceMiddleware, async (req, res) => {
   try {
     const { email, password } = req.body;
     const realPassword = "12345678";
@@ -60,5 +65,10 @@ router.post('/login', bruteforceMiddleware, async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
+
+
+router.get("/register",authController.getRegisterPage);
+
+router.get("/login", authController.getLoginPage)
 
 module.exports = router;
