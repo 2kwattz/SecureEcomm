@@ -38,6 +38,9 @@ const mongoose = require('mongoose');
 const mongodb_url = process.env.DEVELOPMENT_MONGODB_URL
 require('../db/conn')
 
+const { poolPromise } = require('../db/sql/dbConfig.js');  // 
+
+
 // Route Endpoints
 
 const decoyRoutes = require("../routes/decoyRoutes") // Decoy routes for confusing network sniffers & bots
