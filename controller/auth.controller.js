@@ -14,7 +14,11 @@ const postRegisterPage = (req,res) => {
 
   if(password !== confirmPassword){
     
-    return res.status(400).json({error: "Passwords do not match"})
+    return res.status(400).json({
+      "success": false,
+      "error": "Passwords do not match"
+    }
+    )
   } 
 
 
