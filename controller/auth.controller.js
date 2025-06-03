@@ -10,10 +10,17 @@ const getRegisterPage = (req,res) => {
 
 const postRegisterPage = (req,res) => {
 
-  let {firstName,lastName,email,phone,password} = req.body;
+  let {firstName,lastName,email,phone,password,confirmPassword} = req.body;
+
+  if(password !== confirmPassword){
+    
+    return res.status(400).json({error: "Passwords do not match"})
+  } 
 
 
-  console.log("FIRST NAME, LNAME, EMAIL.PASSWORD,PHONE", firstName,lastName,email,password,phone)
+
+
+  console.log("FIRST NAME, LNAME, EMAIL.PASSWORD,PHONE, confirmpassword", firstName,lastName,email,password,phone,confirmPassword)
   return res.status(200).send({"success":"ok"})
 
 }
