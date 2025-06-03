@@ -38,8 +38,7 @@ const mongoose = require('mongoose');
 const mongodb_url = process.env.DEVELOPMENT_MONGODB_URL
 require('../db/conn')
 
-const { poolPromise } = require('../db/sql/dbConfig.js');  // 
-
+const { poolPromise } = require('../db/sql/dbConfig.js');  
 
 // Route Endpoints
 
@@ -67,10 +66,10 @@ const PORT = process.env.PORT || 3000
 
 // Middlewares
 
-// Helmet is a collection of small middleware functions that set HTTP headers
-// to secure your app from common web vulnerabilities such as: Cross-Site Scripting (XSS), Clickjacking
-// MIME sniffing, Protocol downgrade attacks, Cross-Origin data leaks
-
+// Allow CORS 
+app.use(cors({
+  origin: 'http://localhost:3001' // React app address for frontend interaction
+}));
 
 app.use(express.json()); // JSON Parser
 app.use(express.urlencoded({ extended: true })); // Body Parser
@@ -94,6 +93,11 @@ app.use((req, res, next) => {
 });
 
 app.use(mongoSanitize()); // Protection against NoSQL Injection Attacks
+
+// Helmet is a collection of small middleware functions that set HTTP headers
+// to secure your app from common web vulnerabilities such as: Cross-Site Scripting (XSS), Clickjacking
+// MIME sniffing, Protocol downgrade attacks, Cross-Origin data leaks
+
 app.use(helmet()); // Helmet's common web vulnerbility security
 app.use(sqlInjectionGuard); // Protection against SQL Injection Attacks
 app.use(spoofedHeaders) /// Express Header Mask

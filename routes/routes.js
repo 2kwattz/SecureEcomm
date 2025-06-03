@@ -69,6 +69,12 @@ router.post('/login-page', bruteforceMiddleware, async (req, res) => {
 
 router.get("/register",authController.getRegisterPage);
 
+router.post("/register", authController.postRegisterPage)
+
 router.get("/login", authController.getLoginPage)
+
+router.post('/login',  authController.postLoginPage)
+
+
 
 module.exports = router;
