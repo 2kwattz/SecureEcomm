@@ -1,6 +1,26 @@
 const { poolPromise } = require('../db/sql/dbConfig.js');  
 
+const checkEmailExists = async (email) =>{
+  try{
 
+    // Creating db connection pool
+    const pool = await poolPromise;
+
+    const result = await pool.request()
+    .input('email',email)
+    .query('SELECT 1 FROM Users WHERE email = @email');
+
+    console.log("[*] Recordset Response -  ", result)
+    console.log("[*] Recordset Response - Email Validation ", result.recordset.length)
+    return result.recordset.length > 0;
+  }
+  catch(error){
+
+    console.log(`[*] Error in Validating Email Address in database ${error}`)
+    return false;
+
+  }
+}
 
 const getRegisterPage = (req,res) => {
 
@@ -10,8 +30,11 @@ const getRegisterPage = (req,res) => {
 
 const postRegisterPage = (req,res) => {
 
+  // Fetching form data from Registration page
+
   let {firstName,lastName,email,phone,password,confirmPassword} = req.body;
 
+  // Validat
   if(password !== confirmPassword){
     
     return res.status(400).json({
@@ -21,11 +44,20 @@ const postRegisterPage = (req,res) => {
     )
   } 
 
+  // Validating email in database 
+  const emailExistsInDatabase = checkEmailExists(email)
 
+  if(emailExistsInDatabase){
+    console.log("emailExistsInDatabase", emailExistsInDatabase)
 
+    res.status(409).json({"success":false,"error":"User with that Email Address already exists"});
+  }
+  else{
 
+    // Email Address not present in database
+    return res.status(200).send({"success":true})
+  }
   console.log("FIRST NAME, LNAME, EMAIL.PASSWORD,PHONE, confirmpassword", firstName,lastName,email,password,phone,confirmPassword)
-  return res.status(200).send({"success":"ok"})
 
 }
 
