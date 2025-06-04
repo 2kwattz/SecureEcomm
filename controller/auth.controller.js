@@ -1,8 +1,10 @@
-const { poolPromise } = require('../db/sql/dbConfig.js');  
+const { poolPromise } = require('../db/sql/dbConfig.js');  // MSSQL Db Pool
+const jwt = require('jsonwebtoken'); // JWT Token 
+const bcrypt = require('bcryptjs');
+
 
 const checkEmailExists = async (email) =>{
   try{
-
     // Creating db connection pool
     const pool = await poolPromise;
 
@@ -15,7 +17,6 @@ const checkEmailExists = async (email) =>{
     return result.recordset.length > 0;
   }
   catch(error){
-
     console.log(`[*] Error in Validating Email Address in database ${error}`)
     return false;
 
@@ -23,18 +24,18 @@ const checkEmailExists = async (email) =>{
 }
 
 const getRegisterPage = (req,res) => {
-
    return res.send("Register Page")
-
 }
 
-const postRegisterPage = (req,res) => {
+const postRegisterPage = async (req,res) => {
 
   // Fetching form data from Registration page
 
   let {firstName,lastName,email,phone,password,confirmPassword} = req.body;
+ 
+  console.log("FIRST NAME, LNAME, EMAIL.PASSWORD,PHONE, confirmpassword", firstName,lastName,email,password,phone,confirmPassword)
+  // Validate Password locally
 
-  // Validat
   if(password !== confirmPassword){
     
     return res.status(400).json({
@@ -45,19 +46,39 @@ const postRegisterPage = (req,res) => {
   } 
 
   // Validating email in database 
-  const emailExistsInDatabase = checkEmailExists(email)
+
+  const emailExistsInDatabase = await checkEmailExists(email)
 
   if(emailExistsInDatabase){
     console.log("emailExistsInDatabase", emailExistsInDatabase)
+    return res.status(409).json({"success":false,"error":"User with that Email Address already exists"});
+  }
 
-    res.status(409).json({"success":false,"error":"User with that Email Address already exists"});
+  let hashedPassword = await bcrypt.hash(password, 8) // 8 Rounds Salt Encryption
+  console.log("[*] Hashed Password ", hashedPassword);
+
+  const pool = await poolPromise;
+
+  const registrationResult = await pool.request()
+  .input('FirstName',firstName)
+  .input('LastName',lastName)
+  .input('Email',email)
+  .input('Gender',gender)
+  .input('DateOfBirth',dob)
+  .input('PhoneNumber',phone)
+  .input('PasswordHash',hashedPassword)
+  .query(`INSERT INTO Users (firstName, lastName, email, gender, dob, phone, password)
+  VALUES (@FirstName, @LastName, @Email, @Gender, @DateOfBirth, @PhoneNumber, @PasswordHash) `);
+
+  if(registrationResult.rowsAffected[0] === 1){
+    console.log("[*] User Registered Successfully to SecureEcomm")
+    return res.status(201).send({"success":true})
   }
   else{
-
-    // Email Address not present in database
-    return res.status(200).send({"success":true})
+    console.log("[*] User Registration Failed. Full Log ",registrationResult)
+    return res.status(500).send({"success":false,"Error":"User Registration Failed"} )
   }
-  console.log("FIRST NAME, LNAME, EMAIL.PASSWORD,PHONE, confirmpassword", firstName,lastName,email,password,phone,confirmPassword)
+  
 
 }
 
