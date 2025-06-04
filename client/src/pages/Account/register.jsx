@@ -6,7 +6,7 @@ const RegistrationForm = () => {
     firstName: '',
     lastName: '',
     email: '',
-    DateOfBirth: '',
+    dateOfBirth: '',
     gender: '',
     password: '',
     confirmPassword: '',
@@ -32,7 +32,7 @@ const RegistrationForm = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email.trim() || !emailRegex.test(formData.email)) newErrors.email = 'Valid email required.';
 
-    if (!formData.DateOfBirth) newErrors.DateOfBirth = 'Date of birth is required.';
+    if (!formData.dateOfBirth) newErrors.dateOfBirth = 'Date of birth is required.';
 
     if (!formData.gender) newErrors.gender = 'Please select gender.';
 
@@ -131,16 +131,16 @@ const RegistrationForm = () => {
         {errors.phone && <div style={styles.error}>{errors.phone}</div>}
 
         {/* Date of Birth */}
-        <label htmlFor="DateOfBirth">Date of Birth *</label>
+        <label htmlFor="dateOfBirth">Date of Birth *</label>
         <input
           type="date"
-          id="DateOfBirth"
-          name="DateOfBirth"
-          value={formData.DateOfBirth}
+          id="dateOfBirth"
+          name="dateOfBirth"
+          value={formData.dateOfBirth}
           onChange={handleChange}
-          style={errors.DateOfBirth ? styles.inputError : styles.input}
+          style={errors.dateOfBirth ? styles.inputError : styles.input}
         />
-        {errors.DateOfBirth && <div style={styles.error}>{errors.DateOfBirth}</div>}
+        {errors.dateOfBirth && <div style={styles.error}>{errors.dateOfBirth}</div>}
 
         {/* Gender Dropdown */}
         <label htmlFor="gender">Gender *</label>
