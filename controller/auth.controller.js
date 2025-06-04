@@ -76,7 +76,7 @@ const postRegisterPage = async (req,res) => {
   }
   else{
     console.log("[*] User Registration Failed. Full Log ",registrationResult)
-    return res.status(500).send({"success":false,"Error":"User Registration Failed"} )
+    return res.status(500).send({"success":false,"error":"User Registration Failed"} )
   }
   
 
