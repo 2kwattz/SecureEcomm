@@ -186,11 +186,19 @@ const postRegisterPage = async (req, res) => {
         VALUES (@UserID, @Token, @Jti, @IsRevoked, @UserAgent, @ExpiresAt)
       `);
 
-      if(userTokenStorageResult[0] === 1){
+      if(userTokenStorageResult.rowsAffected[0] === 1){
         console.log("[*] JWT Token stored in UserTokens table successfully");
+
+        res.cookie('auth_token', token,{
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'Strict',
+          maxAge: 2 * 60 * 60 * 1000
+
+        })
       }
       else{
-        console.log("[*] Token Insertion Failed. Something broke")
+        console.log("[*] Token Insertion Failed. Failed to store JWT Token")
       }
 
 
