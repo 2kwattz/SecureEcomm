@@ -7,4 +7,12 @@
 3. XSS Sanitization: Prevents Malicilious attacker's code from executing in the web application
 4. SQL Injection Blocking: SQL Injection would be detected and blocked. Attacker's IP Address would be logged
 5. NOSQL Injection Blocking: It would be an SQL Database. NoSQL Injection prevention just to confuse the attacker
+6. IP Blocking Mechanism : Partially Implemented., Used to block IP Addresses from visiting the web app temporarily or permenantly based on conditions yet to implement
+7. HTTPS Enforcement : Enforced https redirection in production mode
+8. Prevention against common attacks: Added protection against common web vulnerbilities such as clickjacking, MIME Sniffing,XSS, CSRF attacks etc.
+9. Service Information Spoofing : Details about the server and technology is hidden and spoofed as PHP/Wordpress for honeypot baiting. Some decoy wordpress pages have been created for the same
+10. CORS Implementation : CORS have been implemented for authorized API usage and to prevent abuse.
+
+## Emails
+
    
