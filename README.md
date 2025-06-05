@@ -1,3 +1,8 @@
+# Technology Stack
+1. ReactJs - Frontend
+2. NodeJs with ExpressJs - Backend
+3. MSSQL - Database
+   
 # Work done till now
 
 ## Security Implementations
