@@ -18,7 +18,15 @@
 1. Basic Email configuration has been set to send emails from the web application.
 2. Email Templates for account creation, Password reset link, Order created has been done. Backend logic to send email based on 'type' for the same has been configured
 
+## Backend
+
+### Basic server configuration
+1. Basic routing, middlewares configurations , db configurations, dotenv and rest of the groundwork for a basic server has been completed.
+2. Error handing middleware created for http error redirects (i.e 500 - Internal Server Error, 400 - Invalid Request, 404 - Not Found etc) 
+
 ## Database
 
 1. MSSQL Database has been connected and configured for the Nodejs server
+2. Users Table based on Data dictionary has been created
+   
    
