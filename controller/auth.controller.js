@@ -143,12 +143,31 @@ const postRegisterPage = async (req, res) => {
         .input('PhoneNumber', phone)
         .input('PasswordHash', hashedPassword)
         .query(`INSERT INTO Users (FirstName, LastName, Email, Gender, DateOfBirth, PhoneNumber, PasswordHash)
+        OUTPUT INSERTED.ID
    VALUES (@FirstName, @LastName, @Email, @Gender, @DateOfBirth, @PhoneNumber, @PasswordHash) `);
   
   
       if (registrationResult.rowsAffected[0] === 1) {
+        const recordsetUid = registrationResult?.recordset[0].ID
+
+        if(!recordsetUid){
+          console.log("[*] Error Fetching Recordset UID from database")
+        }
+        console.log("[*] Recordset ID Generated for the registered user")
         console.log("[*] User Registered Successfully to SecureEcomm")
-        return res.status(201).json({ success: true, message:"User Registration Successfull" })
+
+        const tokenPayload = {
+          id: recordsetUid,
+          email,
+          phone,
+          name: `${firstName} ${lastName}`,
+          role: "customer"
+        }
+
+        const token = jwt.sign(tokenPayload, process.env.JWT_SECRET_KEY,{expiresIn: "1h"});
+
+        console.log("[*] Sample Token Payload", tokenPayload)
+        return res.status(201).json({ success: true, message:"User Registration Successful",token:token})
       }
       else {
         console.log("[*] User Registration Failed. Full Log ", registrationResult)

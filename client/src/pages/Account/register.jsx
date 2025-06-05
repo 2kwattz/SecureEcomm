@@ -50,9 +50,11 @@ const RegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    if (!validate()) return;
+    // if (!validate()) return;
   
     try {
+
+      console.log("Making Register Post Request")
       const response = await fetch('http://150.107.210.11/register', {
         method: 'POST',
         headers: {
