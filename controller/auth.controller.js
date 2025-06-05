@@ -48,6 +48,7 @@ const postRegisterPage = async (req, res) => {
 
     const allowedGenders = ['male', 'female', 'other'];
     let hashedPassword;
+    let recordsetUid; // Unique Database Id for each registered user
 
     // Fetching form data from Registration page
     let { firstName, lastName, email, phone, password, confirmPassword, dateOfBirth, gender } = req.body;
@@ -149,7 +150,7 @@ const postRegisterPage = async (req, res) => {
   
   
       if (registrationResult.rowsAffected[0] === 1) {
-        const recordsetUid = registrationResult?.recordset[0].ID
+        recordsetUid = registrationResult?.recordset[0].ID
 
         if(!recordsetUid){
           console.log("[*] Error Fetching Recordset UID from database")
@@ -169,7 +170,29 @@ const postRegisterPage = async (req, res) => {
         }
 
         const token = jwt.sign(tokenPayload, process.env.JWT_SECRET_KEY,{expiresIn: "1h"});
-        const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // JWT Token Expiry
+
+        const userAgent = req.headers['user-agent'] || 'unknown';
+        const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // JWT Token Expiry (1 hour)
+
+        const userTokenStorageResult = await pool.request()
+        .input('UserID',recordsetUid)
+        .input('Token', token)
+        .input('Jti', jti)
+        .input('IsRevoked',0)
+        .input('UserAgent',userAgent)
+        .input('ExpiresAt', expiresAt)
+        .query(`
+        INSERT INTO UserTokens (UserID, Token, Jti, IsRevoked, UserAgent, ExpiresAt)
+        VALUES (@UserID, @Token, @Jti, @IsRevoked, @UserAgent, @ExpiresAt)
+      `);
+
+      if(userTokenStorageResult[0] === 1){
+        console.log("[*] JWT Token stored in UserTokens table successfully");
+      }
+      else{
+        console.log("[*] Token Insertion Failed. Something broke")
+      }
+
 
         console.log("[*] Sample Token Payload", tokenPayload)
         return res.status(201).json({ success: true, message:"User Registration Successful",token:token})
