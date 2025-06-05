@@ -1,6 +1,7 @@
 const { poolPromise } = require('../db/sql/dbConfig.js');  // MSSQL Db Pool
 const jwt = require('jsonwebtoken'); // JWT Token 
 const bcrypt = require('bcryptjs'); // Password Encryption Library
+const { randomUUID } = require('crypto'); // Unique Identifier generator for JWT Token
 
 const checkEmailExists = async (email) => {
   try {
@@ -154,6 +155,8 @@ const postRegisterPage = async (req, res) => {
           console.log("[*] Error Fetching Recordset UID from database")
         }
         console.log("[*] Recordset ID Generated for the registered user")
+
+        const jti = randomUUID() // Unique Token Id for non identical payload
         console.log("[*] User Registered Successfully to SecureEcomm")
 
         const tokenPayload = {
@@ -161,10 +164,12 @@ const postRegisterPage = async (req, res) => {
           email,
           phone,
           name: `${firstName} ${lastName}`,
-          role: "customer"
+          role: "customer",
+          jti:jti
         }
 
         const token = jwt.sign(tokenPayload, process.env.JWT_SECRET_KEY,{expiresIn: "1h"});
+        const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // JWT Token Expiry
 
         console.log("[*] Sample Token Payload", tokenPayload)
         return res.status(201).json({ success: true, message:"User Registration Successful",token:token})
