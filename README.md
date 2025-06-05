@@ -15,4 +15,10 @@
 
 ## Emails
 
+1. Basic Email configuration has been set to send emails from the web application.
+2. Email Templates for account creation, Password reset link, Order created has been done. Backend logic to send email based on 'type' for the same has been configured
+
+## Database
+
+1. MSSQL Database has been connected and configured for the Nodejs server
    
