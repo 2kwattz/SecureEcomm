@@ -189,21 +189,32 @@ const postRegisterPage = async (req, res) => {
       if(userTokenStorageResult.rowsAffected[0] === 1){
         console.log("[*] JWT Token stored in UserTokens table successfully");
 
+        // res.cookie('auth_token', token,{
+        //   httpOnly: true,
+        //   secure: process.env.NODE_ENV === 'production',
+        //   sameSite: 'Strict',
+        //   maxAge: 2 * 60 * 60 * 1000
+
+        // })
+
+        // Development Mode Cookie Storage Mechanism
+
         res.cookie('auth_token', token,{
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'Strict',
+          secure: false,
+          sameSite: 'Lax',
           maxAge: 2 * 60 * 60 * 1000
 
         })
+
+        console.log("[*] Sample Token Payload", tokenPayload)
+        return res.status(201).json({ success: true, message:"User Registration Successful",token:token})
+
+
       }
       else{
         console.log("[*] Token Insertion Failed. Failed to store JWT Token")
       }
-
-
-        console.log("[*] Sample Token Payload", tokenPayload)
-        return res.status(201).json({ success: true, message:"User Registration Successful",token:token})
       }
       else {
         console.log("[*] User Registration Failed. Full Log ", registrationResult)
