@@ -74,7 +74,7 @@ app.use(cors({
 
 app.use(express.json()); // JSON Parser
 app.use(express.urlencoded({ extended: true })); // Body Parser
-app.set('trust proxy', true); // Allows Express to look at X-Forwarded-For header to get Client's IP Address
+app.set('trust proxy', false); // Allows Express to look at X-Forwarded-For header to get Client's IP Address
 app.use(compression()) // GZip Compression for faster loading time
 // app.use(csrf({ cookie: true }));
 

@@ -267,6 +267,10 @@ const postLoginPage = async (req, res) => {
     const emailExists = await checkEmailExists(email);
 
     if(!emailExists){
+
+      // Need to create a bcrypt hash for dummy password hashing to avoid Email Enumeration via timing
+      // Reason : If email doesnt exist => Fast Return. If email exists => bcrypt compare adds delay
+       
      return res.status(409).json({success: false,error:"Invalid Credentials"})
     }
     else{
