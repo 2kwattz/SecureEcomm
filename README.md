@@ -27,7 +27,10 @@
 
 ### Basic server configuration
 1. Basic routing, middlewares configurations , db configurations, dotenv and rest of the groundwork for a basic server has been completed.
-2. Error handing middleware created for http error redirects (i.e 500 - Internal Server Error, 400 - Invalid Request, 404 - Not Found etc) 
+2. Error handing middleware created for http error redirects (i.e 500 - Internal Server Error, 400 - Invalid Request, 404 - Not Found etc)
+
+### Authentication
+1. Features RBAC based User authentication
 
 ## Database
 
