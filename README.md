@@ -17,6 +17,7 @@
 8. Prevention against common attacks: Added protection against common web vulnerbilities such as clickjacking, MIME Sniffing,XSS, CSRF attacks etc.
 9. Service Information Spoofing : Details about the server and technology is hidden and spoofed as PHP/Wordpress for honeypot baiting. Some decoy wordpress pages have been created for the same
 10. CORS Implementation : CORS have been implemented for authorized API usage and to prevent abuse.
+11. Soft Slow Down Implemented. Hard Rate Limit Implemented for JWT Login
 
 ## Emails
 
@@ -31,10 +32,15 @@
 
 ### Authentication
 1. Features RBAC based User authentication
+2. Frontend and Backend Validation logic added for JWT Login system
+3. Password Hashing implemented with 12 rounds of encryption using Bycrypt
+4. Stored JWT Token in cookies as http only and other security measures
 
 ## Database
 
 1. MSSQL Database has been connected and configured for the Nodejs server
 2. Users Table based on Data dictionary has been created
+3. Separate Table has been created to store user sessions including device fingerprints
+
    
    
