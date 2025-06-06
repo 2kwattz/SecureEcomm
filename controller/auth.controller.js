@@ -244,7 +244,7 @@ const getLoginPage = (req, res) => {
 </head>
 <body>
     <h2>Login</h2>
-    <form action="/login-page" method="POST">
+    <form action="/login" method="POST">
         <label for="email">Email:</label><br>
         <input type="email" id="email" name="email" required><br><br>
         <label for="password">Password:</label><br>
@@ -263,6 +263,15 @@ const postLoginPage = async (req, res) => {
   try {
     const { email, password } = req.body;
     const realPassword = "12345678";
+
+    const emailExists = await checkEmailExists(email);
+
+    if(!emailExists){
+     return res.status(409).json({success: false,error:"Invalid Credentials"})
+    }
+    else{
+      console.log("[*] ELSE CONDITION")
+    }
 
     if (password !== realPassword) {
       await req.bruteforce.fail();

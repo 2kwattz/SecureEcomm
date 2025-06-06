@@ -55,8 +55,9 @@ const RegistrationForm = () => {
     try {
 
       console.log("Making Register Post Request")
-      const response = await fetch('http://150.107.210.11/register', {
+      const response = await fetch('http://localhost:3000/register', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },

@@ -2,6 +2,7 @@ const authController = require('../controller/auth.controller.js');
 
 const express = require('express');
 const router = express.Router();
+const {loginLimiter} = require('../middlewares/rateLimiter')
 
 //  Auth Controller 
 
@@ -73,7 +74,7 @@ router.post("/register", authController.postRegisterPage)
 
 router.get("/login", authController.getLoginPage)
 
-router.post('/login',  authController.postLoginPage)
+router.post('/login', loginLimiter,bruteforceMiddleware,  authController.postLoginPage)
 
 
 

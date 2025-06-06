@@ -68,7 +68,8 @@ const PORT = process.env.PORT || 3000
 
 // Allow CORS 
 app.use(cors({
-  origin: 'http://localhost:3001' // React app address for frontend interaction
+  origin: 'http://localhost:3001',
+  credentials: true // React app address for frontend interaction
 }));
 
 app.use(express.json()); // JSON Parser
