@@ -42,5 +42,10 @@
 2. Users Table based on Data dictionary has been created
 3. Separate Table has been created to store user sessions including device fingerprints
 
+## Frontend
+
+1. Basic React Project set, Routes added
+2. Registration Page created. Frontend validations for Name, Email, Password added
+
    
    
