@@ -35,6 +35,7 @@
 2. Frontend and Backend Validation logic added for JWT Login system
 3. Password Hashing implemented with 12 rounds of encryption using Bycrypt
 4. Stored JWT Token in cookies as http only and other security measures
+5. JWT Payload itself contains JTI as it invalidate a particular token by storing its jti in a blacklist
 
 ## Database
 
