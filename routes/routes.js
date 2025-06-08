@@ -8,8 +8,11 @@ const {loginLimiter} = require('../middlewares/rateLimiter')
 
 
 // Middleware imports
-const sqlInjectionGuard = require('../middlewares/sqlInjectionGuard'); 
-const bruteforceMiddleware = require('../middlewares/bruteforceMiddleware'); 
+const sqlInjectionGuard = require('../middlewares/sqlInjectionGuard'); // To detect and block SQL Injections 
+const bruteforceMiddleware = require('../middlewares/bruteforceMiddleware'); // To detect and prevent bruteforce attacks based on Email + UA + IP Key
+const targetedBruteforceRateLimiter = require('../middlewares/targetedBruteforceRateLimiter') // To detect targeted bruteforce attacks regardless of botnets etc
+const generalBruteforceRateLimiter = require('../middlewares/generalBruteforceRateLimiter') // Generalized middleware to detect and prevent bruteforce attacks (including spray attacks) based on UA + IP
+
 
 // GET: Simulate server crash
 router.get('/error500', (req, res, next) => {
@@ -74,7 +77,7 @@ router.post("/register", authController.postRegisterPage)
 
 router.get("/login", authController.getLoginPage)
 
-router.post('/login', loginLimiter,bruteforceMiddleware,  authController.postLoginPage)
+router.post('/login', loginLimiter,generalBruteforceRateLimiter,targetedBruteforceRateLimiter,bruteforceMiddleware,  authController.postLoginPage)
 
 
 

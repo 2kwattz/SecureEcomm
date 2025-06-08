@@ -268,21 +268,39 @@ const postLoginPage = async (req, res) => {
 
     if(!emailExists){
 
-      // Need to create a bcrypt hash for dummy password hashing to avoid Email Enumeration via timing
+      // Need to create a fake bcrypt hash for dummy password hashing to avoid Email Enumeration via timing attack
       // Reason : If email doesnt exist => Fast Return. If email exists => bcrypt compare adds delay
-     await req.bruteforce.fail();
-     return res.status(409).json({success: false,error:"Invalid Credentials Email"})
+
+      // Email Enumeration is when an attacker tries to figure out whether a specific email exists in your system
+      // without having access to the database. They do this by sending login or signup requests and looking for
+      //  differences in responses (timing, messages, status codes, etc.).
+
+      // If email does not exist, A fake bcrypt hash is used to simulate password checking:
+      // Reason : Attacker sends 1000 login requests with random emails.
+      // If the response is instant, email does not exist. If the response is slightly delayed, email exists.
+
+      const dummyHash = "$2a$10$fakesaltfakesaltfakesaltfakesaltfakesa"; // The response time is always the same regardless of whether the email exists or not.
+     await bcrypt.compare(password, dummyHash);
+     await req.genbruteforce.fail();
+     return res.status(401).json({success: false,error:"Invalid Credentials Email"})
     }
     else{
       console.log("[*] ELSE CONDITION")
     }
 
     if (password !== realPassword) {
-      await req.bruteforce.fail();
+
+      try{
+
+        await req.genbruteforce.fail();
+      }
+      catch(error){
+        console.error("[*] General Bruteforce Rate Limiter Middleware failed ",error)
+      }
       console.log(`[*] Login Failed`);
       return res.status(401).json({ message: "Invalid credentials" });
     } else {
-      await req.bruteforce.success();
+      await req.genbruteforce.success();
       res.status(200).json({ message: "Logged in successfully" });
     }
   } catch (error) {

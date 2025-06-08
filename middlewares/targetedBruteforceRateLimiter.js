@@ -31,7 +31,7 @@ const delAsync = promisify(client.del).bind(client);
 const MAX_LOGIN_ATTEMPTS = 10; // Max failed login attempts
 const BLOCKED_TIME = 15 * 60; // Blocked for 15 minutes
 
-const targetedBruteforceMiddleware = async(req,res,next) => {
+const targetedBruteforceRateLimiter = async(req,res,next) => {
 
     // Fetching IP Addresses of the suspicious user
     const ip = req.ip || req.connection.remoteAddress;
@@ -52,7 +52,7 @@ const targetedBruteforceMiddleware = async(req,res,next) => {
          message: "Too many login attempts. Please try again after 15 minutes"
      })
  }
- req.bruteforce = {
+ req.tarbruteforce = {
      fail: async() =>{
          if(!attempts){
              await setAsync(key, 1);
@@ -78,4 +78,4 @@ const targetedBruteforceMiddleware = async(req,res,next) => {
 
 }
 
-module.exports =  targetedBruteforceMiddleware
+module.exports =  targetedBruteforceRateLimiter
