@@ -1,3 +1,12 @@
+// In the bruteforceMiddleware.js, Each failed login attempt ( wrong password ) increments the counter for the exact key
+// If the user tries a wrong password for that email, It increments the failed attepts counter for that email + ip + ua
+// The previous middleware is good for protecting specific accounts from targeted bruteforce attacks, But weak against attackers spraying many emails
+// This middleware aims to eliminate this issue
+
+// A global rate limiter is added in place regardless of the email  address.
+
+// This middleware is based on IP + UA (User Agent) key which follows a more generalized approach 
+
 const redis = require('redis');
 const { promisify } = require("util")
 const client = redis.createClient({legacyMode: true}); // Connecting to Redis
@@ -5,7 +14,7 @@ const useragent = require('useragent'); // Fetches Device Fingerprints
 
 //  Connecting to the Redis Client
 client.connect().catch((err) => {
-    console.log("[*] [BruteforceMiddleware] Error In Connecting To The Redis Client:", err);
+    console.log("[*] [GeneralBruteforceRteLimiter Middleware] Error In Connecting To The Redis Client:", err);
 });
 
 // Converted Redis Commands for Async/Await versions
@@ -22,21 +31,6 @@ const delAsync = promisify(client.del).bind(client);
 const MAX_LOGIN_ATTEMPTS = 10; // Max failed login attempts
 const BLOCKED_TIME = 15 * 60; // Blocked for 15 minutes
 
-// Sever-side device fingerprinting generation
-
-const generateServersideFingerprint = (req) => {
-    const ip = req.ip || req.connection.remoteAddress; // To get client's IP Address
-    const userAgent = req.get('User-Agent'); // To get user agent headers
-    const language = req.get('Accept-Language');
-
-    const agent = useragent.parse(userAgent)
-
-    const fingerprint = `${ip} | ${agent.family} | ${agent.os} | ${language}`
-    // console.log("[*] User Fingerprint captured ", fingerprint)
-
-    return fingerprint;
-}
-
 const bruteforceMiddleware = async(req,res,next) => {
 
     // Fetching IP Addresses of the suspicious user
@@ -47,7 +41,7 @@ const bruteforceMiddleware = async(req,res,next) => {
     const emailAddress = req?.body?.email.trim().toLowerCase();
 
     // Unique key for this combo
-    const key = `bf:${ip}:${fingerprint}:${emailAddress}`;
+    const key = `bf:${ip}:${fingerprint}`;
 
     try{
  // Check for failed attempts
@@ -71,7 +65,7 @@ const bruteforceMiddleware = async(req,res,next) => {
          }
      },
      success: async () =>{
-         delAsync(key)
+         await delAsync(key)
      }
  };
 

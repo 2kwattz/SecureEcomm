@@ -270,8 +270,8 @@ const postLoginPage = async (req, res) => {
 
       // Need to create a bcrypt hash for dummy password hashing to avoid Email Enumeration via timing
       // Reason : If email doesnt exist => Fast Return. If email exists => bcrypt compare adds delay
-       
-     return res.status(409).json({success: false,error:"Invalid Credentials"})
+     await req.bruteforce.fail();
+     return res.status(409).json({success: false,error:"Invalid Credentials Email"})
     }
     else{
       console.log("[*] ELSE CONDITION")
