@@ -35,12 +35,18 @@
 2. Frontend and Backend Validation logic added for JWT Login system
 3. Password Hashing implemented with 12 rounds of encryption using Bycrypt
 4. Stored JWT Token in cookies as http only and other security measures
+5. JWT Payload itself contains JTI as it invalidate a particular token by storing its jti in a blacklist
 
 ## Database
 
 1. MSSQL Database has been connected and configured for the Nodejs server
 2. Users Table based on Data dictionary has been created
 3. Separate Table has been created to store user sessions including device fingerprints
+
+## Frontend
+
+1. Basic React Project set, Routes added
+2. Registration Page created. Frontend validations for Name, Email, Password added
 
    
    
