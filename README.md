@@ -18,6 +18,7 @@
 9. Service Information Spoofing : Details about the server and technology is hidden and spoofed as PHP/Wordpress for honeypot baiting. Some decoy wordpress pages have been created for the same
 10. CORS Implementation : CORS have been implemented for authorized API usage and to prevent abuse.
 11. Soft Slow Down Implemented. Hard Rate Limit Implemented for JWT Login
+12. Created 2 bruteforce middlewares, General Bruteforce Rate LImiter and Targeted Bruteforce Rate Limiter to counter Spray Bruteforce attacks and attacks targeted on a specific user 
 
 ## Emails
 
