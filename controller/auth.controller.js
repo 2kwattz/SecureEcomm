@@ -1,4 +1,4 @@
-const { poolPromise } = require('../db/sql/dbConfig.js');  // MSSQL Db Pool
+const { poolPromise, sql } = require('../db/sql/dbConfig.js');  // MSSQL Db Pool
 const jwt = require('jsonwebtoken'); // JWT Token 
 const bcrypt = require('bcryptjs'); // Password Encryption Library
 const { randomUUID } = require('crypto'); // Unique Identifier generator for JWT Token
@@ -136,7 +136,15 @@ const postRegisterPage = async (req, res) => {
     try{
       const pool = await poolPromise;
 
-      const registrationResult = await pool.request()
+      // Begin SQL Transaction
+
+      const transaction = new sql.Transaction(pool)
+
+      await transaction.begin()
+
+      const request = new sql.Request(transaction)
+
+      const registrationResult = await request
         .input('FirstName', firstName)
         .input('LastName', lastName)
         .input('Email', email)
@@ -171,10 +179,12 @@ const postRegisterPage = async (req, res) => {
 
         const token = jwt.sign(tokenPayload, process.env.JWT_SECRET_KEY,{expiresIn: "1h"});
 
+        
+
         const userAgent = req.headers['user-agent'] || 'unknown';
         const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // JWT Token Expiry (1 hour)
 
-        const userTokenStorageResult = await pool.request()
+        const userTokenStorageResult = await request
         .input('UserID',recordsetUid)
         .input('Token', token)
         .input('Jti', jti)
@@ -185,7 +195,9 @@ const postRegisterPage = async (req, res) => {
         INSERT INTO UserTokens (UserID, Token, Jti, IsRevoked, UserAgent, ExpiresAt)
         VALUES (@UserID, @Token, @Jti, @IsRevoked, @UserAgent, @ExpiresAt)
       `);
+      await transaction.commit();
 
+      console.log("[*] Transcation Commited.")
       if(userTokenStorageResult.rowsAffected[0] === 1){
         console.log("[*] JWT Token stored in UserTokens table successfully");
 
@@ -222,7 +234,9 @@ const postRegisterPage = async (req, res) => {
       }
     }
     catch(error){
-      console.log("[*] Error In Creating New User ",error)
+      console.log("[*] Error In Creating New User. Transaction Failed. Rolling back ",error)
+      await transaction.rollback()
+
       return res.status(500).json({ success: false, error: "User Registration Failed" })
     }
 
@@ -279,7 +293,8 @@ const postLoginPage = async (req, res) => {
       // Reason : Attacker sends 1000 login requests with random emails.
       // If the response is instant, email does not exist. If the response is slightly delayed, email exists.
 
-      const dummyHash = "$2a$10$fakesaltfakesaltfakesaltfakesaltfakesa"; // The response time is always the same regardless of whether the email exists or not.
+      const dummyHash = "$2b$10$CwTycUXWue0Thq9StjUM0uJ8HZkgBG/MNoBzph/1pGl.YMdrWcGWy"; // hash for 'fakepassword'
+      // The response time is always the same regardless of whether the email exists or not.
      await bcrypt.compare(password, dummyHash);
      await req.genbruteforce.fail();
      return res.status(401).json({success: false,error:"Invalid Credentials Email"})
@@ -293,14 +308,16 @@ const postLoginPage = async (req, res) => {
       try{
 
         await req.genbruteforce.fail();
+        // await req.tarbruteforce.fail();
       }
       catch(error){
-        console.error("[*] General Bruteforce Rate Limiter Middleware failed ",error)
+        console.error("[*] General Bruteforce Rate Limiter/Targeted Bruteforce Middleware failed ",error)
       }
       console.log(`[*] Login Failed`);
       return res.status(401).json({ message: "Invalid credentials" });
     } else {
       await req.genbruteforce.success();
+      // await req.tarbruteforce.success();
       res.status(200).json({ message: "Logged in successfully" });
     }
   } catch (error) {
