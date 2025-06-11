@@ -49,7 +49,8 @@ const targetedBruteforceRateLimiter = async(req,res,next) => {
 
  if(attempts && parseInt(attempts) >= MAX_LOGIN_ATTEMPTS){
      return res.status(429).json({
-         message: "Too many login attempts. Please try again after 15 minutes"
+         message: "Too many login attempts. Email Verification required",
+         emailVerificationRequired: true
      })
  }
  req.tarbruteforce = {

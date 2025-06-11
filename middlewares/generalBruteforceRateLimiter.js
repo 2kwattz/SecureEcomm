@@ -28,7 +28,7 @@ const delAsync = promisify(client.del).bind(client);
 
 // Login Bruteforce Prevention
 
-const MAX_LOGIN_ATTEMPTS = 10; // Max failed login attempts
+const MAX_LOGIN_ATTEMPTS = 15; // Max failed login attempts
 const BLOCKED_TIME = 15 * 60; // Blocked for 15 minutes
 
 const generalBruteforceRateLimiter = async(req,res,next) => {

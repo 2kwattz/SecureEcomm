@@ -77,7 +77,7 @@ router.post("/register", authController.postRegisterPage)
 
 router.get("/login", authController.getLoginPage)
 
-router.post('/login', loginLimiter,generalBruteforceRateLimiter,targetedBruteforceRateLimiter,bruteforceMiddleware,  authController.postLoginPage)
+router.post('/login', loginLimiter,generalBruteforceRateLimiter,targetedBruteforceRateLimiter,  authController.postLoginPage)
 
 
 
