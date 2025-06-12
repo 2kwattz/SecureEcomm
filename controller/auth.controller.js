@@ -2,6 +2,7 @@ const { poolPromise, sql } = require('../db/sql/dbConfig.js');  // MSSQL Db Pool
 const jwt = require('jsonwebtoken'); // JWT Token 
 const bcrypt = require('bcryptjs'); // Password Encryption Library
 const { randomUUID } = require('crypto'); // Unique Identifier generator for JWT Token
+const { pool } = require('mssql');
 
 const checkEmailExists = async (email) => {
   try {
@@ -275,7 +276,21 @@ const getLoginPage = (req, res) => {
 const postLoginPage = async (req, res) => {
 
   try {
-    const { email, password } = req.body;
+    let { email, password } = req.body;
+
+    // Sanitization of email and password 
+    email = sanitizeInput(email);
+    password = sanitizeInput(password);
+
+    const userAgent = req.headers['user-agent'] || 'unknown';
+
+    // Fetching User Details
+    const emailResult = await pool.request()
+      .input('Email', email)
+      .query(`SELECT Id, PasswordHash, FirstName, LastName, PhoneNumber FROM Users WHERE Email = @Email`);
+
+    const user = emailResult.recordset[0];
+
     const realPassword = "12345678";
 
     const emailExists = await checkEmailExists(email);
@@ -300,7 +315,55 @@ const postLoginPage = async (req, res) => {
      return res.status(401).json({success: false,error:"Invalid Credentials Email"})
     }
     else{
-      console.log("[*] ELSE CONDITION")
+      console.log("[*] Email Exists. Proceeding Further")
+    }
+
+    // Fetching password from database
+
+    const hashedPasswordFromDb = await pool.request()
+    .input('Email', email)
+    .query('SELECT PasswordHash FROM Users WHERE Email = @email');
+
+    
+  
+    // Comparing password hash
+    if(hashedPasswordFromDb){
+
+      const isPasswordMatch = await bcrypt.compare(password,hashedPasswordFromDb);
+
+      if(!isPasswordMatch){
+        res.status(401).json({success: false, message:"Invalid Credentials"})
+      }
+      else{
+
+        console.log("[*] Password Match Found ")
+        const jti = randomUUID();
+        const tokenPayload = {
+          id: user.Id,
+          email,
+          phone: user.PhoneNumber,
+          name: `${user.FirstName} ${user.LastName}`,
+          role: "customer",
+          jti
+        };
+
+        const token = jwt.sign(tokenPayload, process.env.JWT_SECRET_KEY, { expiresIn: "1h" });
+        const expiresAt = new Date(Date.now() + 60 * 60 * 2000);
+
+        // SQL Transcation Started
+
+        const transaction = new sql.Transaction(pool);
+        await transaction.begin();
+        const trxRequest = new sql.Request(transaction);
+
+        const existingToken = await trxRequest
+      .input('UserID', user.ID)
+      .input('UserAgent', userAgent)
+      .query(`SELECT ID FROM UserTokens WHERE UserID = @UserID AND UserAgent = @UserAgent AND IsRevoked = 0`);
+      }
+    }
+    else{
+      console.log("[*] Error in fetching hashed password from database")
     }
 
     if (password !== realPassword) {
@@ -308,7 +371,7 @@ const postLoginPage = async (req, res) => {
       try{
 
         await req.genbruteforce.fail();
-        // await req.tarbruteforce.fail();
+        await req.tarbruteforce.fail();
       }
       catch(error){
         console.error("[*] General Bruteforce Rate Limiter/Targeted Bruteforce Middleware failed ",error)
@@ -316,8 +379,10 @@ const postLoginPage = async (req, res) => {
       console.log(`[*] Login Failed`);
       return res.status(401).json({ message: "Invalid credentials" });
     } else {
+
+      // Reset Targeted and General Bruteforce counter
       await req.genbruteforce.success();
-      // await req.tarbruteforce.success();
+      await req.tarbruteforce.success();
       res.status(200).json({ message: "Logged in successfully" });
     }
   } catch (error) {

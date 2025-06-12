@@ -29,7 +29,8 @@ const delAsync = promisify(client.del).bind(client);
 // Login Bruteforce Prevention
 
 const MAX_LOGIN_ATTEMPTS = 10; // Max failed login attempts
-const BLOCKED_TIME = 15 * 60; // Blocked for 15 minutes
+const BLOCKED_TIME = 1 * 60 * 60; // Blocked for 1 hour
+
 
 const targetedBruteforceRateLimiter = async(req,res,next) => {
 
@@ -48,6 +49,9 @@ const targetedBruteforceRateLimiter = async(req,res,next) => {
  const attempts = await getAsync(key)
 
  if(attempts && parseInt(attempts) >= MAX_LOGIN_ATTEMPTS){
+
+    console.log(`[!] Blocking IP + Email for ${BLOCKED_TIME / 3600} hours due to repeated login failures.`);
+
      return res.status(429).json({
          message: "Too many login attempts. Email Verification required",
          emailVerificationRequired: true
